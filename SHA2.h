@@ -1,6 +1,6 @@
 #ifndef DECENTRALIZED_DBMS_SHA2_H
 #define DECENTRALIZED_DBMS_SHA2_H
-
+//6395+6
 
 #include <iostream>
 //#include <windows.h>
