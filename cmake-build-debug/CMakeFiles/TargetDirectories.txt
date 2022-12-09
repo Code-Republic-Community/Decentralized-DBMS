@@ -1,0 +1,3 @@
+/home/yuri/Desktop/Picsart/Decentralized-DBMS/cmake-build-debug/CMakeFiles/Decentralized_DBMS.dir
+/home/yuri/Desktop/Picsart/Decentralized-DBMS/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/yuri/Desktop/Picsart/Decentralized-DBMS/cmake-build-debug/CMakeFiles/rebuild_cache.dir
