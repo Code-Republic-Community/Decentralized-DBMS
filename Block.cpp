@@ -1,6 +1,3 @@
-//
-// Created by yuri on 12/9/22.
-//
 
 #include "Block.h"
 #include "SHA2.h"

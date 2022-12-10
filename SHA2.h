@@ -1,11 +1,21 @@
 #ifndef DECENTRALIZED_DBMS_SHA2_H
 #define DECENTRALIZED_DBMS_SHA2_H
-//6395+6
 
 #include <iostream>
 //#include <windows.h>
-#include<unistd.h>
+//#include<unistd.h>
 #include <sstream>
+
+
+#ifdef _WINDOWS
+#include <windows.h>
+#else
+#include <unistd.h>
+#define Sleep(x) usleep((x)*1000)
+#endif
+
+
+
 // hastatunner voronq vercvel en hesh algoriti arajin 8 parz tveri qarakusi amrnati amboxj mas@  heshavorelu ardyunqum
 uint32_t s0, s1;
 // hastatunner [2,311] mijakayqi parz tveric qarakusi armat hanac kotorakayin maseri 16 akan tesq@
@@ -33,9 +43,9 @@ std::stringstream compression(uint32_t* w) {
     f = h5;
     g = h6;
     h = h7;
-    uint32_t k[] = { 0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
-                     0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98,
-                     0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
+    uint32_t k[] = { 0x428a2f98,  0x71374491,  0xb5c0fbcf,  0xe9b5dba5,
+                     0x3956c25b,  0x59f111f1,  0x923f82a4,  0xab1c5ed5,  0xd807aa98,
+                     0x12835b01,  0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe,
                      0x9bdc06a7, 0xc19bf174, 0xe49b69c1, 0xefbe4786, 0x0fc19dc6,
                      0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
                      0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3,
@@ -80,9 +90,8 @@ std::stringstream compression(uint32_t* w) {
 };
 
 std::stringstream hash_2(const char* str) {
-    sleep(5);
+    Sleep(5000);
     uint32_t* w = new uint32_t[64];
-
     short counter = 4;
     short ind_w = 0;
     short ind_str = 0;

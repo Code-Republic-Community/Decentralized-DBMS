@@ -1,6 +1,3 @@
-//
-// Created by yuri on 12/9/22.
-//
 
 #include "BlockChain.h"
 

@@ -1,6 +1,3 @@
-//
-// Created by yuri on 12/9/22.
-//
 
 #ifndef DECENTRALIZED_DBMS_BLOCKCHAIN_H
 #define DECENTRALIZED_DBMS_BLOCKCHAIN_H
