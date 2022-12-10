@@ -27,7 +27,4 @@ int main() {
     std::cout << "previous hash: " << chain.get_last_block().get_prev_hash() << std::endl;
     std::cout << "count: " << chain.count_of_blocks() << std::endl;
     std::cout << "============================================================" << std::endl;
-
-
 }
-
