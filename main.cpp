@@ -1,8 +1,8 @@
 #include "BlockChain.h"
 
 int main() {
-    BlockChain chain;   //created chain with genesis bloack
 
+    BlockChain chain;   //created chain with genesis bloack
     std::cout << "============================================================" << std::endl;
     std::cout << "index: " << chain.get_last_block().get_index() << std::endl;
     std::cout << "hash:  " << chain.get_last_block().get_hash() << std::endl;
