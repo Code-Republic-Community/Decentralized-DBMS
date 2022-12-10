@@ -1,4 +1,3 @@
-
 #include "BlockChain.h"
 
 BlockChain::BlockChain() {

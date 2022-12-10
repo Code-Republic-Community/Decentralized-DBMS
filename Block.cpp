@@ -1,4 +1,3 @@
-
 #include "Block.h"
 #include "SHA2.h"
 Block::Block(unsigned int idx, Data d, std::string ph) {

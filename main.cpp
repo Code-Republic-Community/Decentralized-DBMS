@@ -28,5 +28,6 @@ int main() {
     std::cout << "count: " << chain.count_of_blocks() << std::endl;
     std::cout << "============================================================" << std::endl;
 
+
 }
 

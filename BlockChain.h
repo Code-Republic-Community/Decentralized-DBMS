@@ -1,10 +1,10 @@
-
 #ifndef DECENTRALIZED_DBMS_BLOCKCHAIN_H
 #define DECENTRALIZED_DBMS_BLOCKCHAIN_H
 
 #include <iostream>
 #include <vector>
 #include "Block.h"
+
 class BlockChain {
 
 public:

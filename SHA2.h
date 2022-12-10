@@ -2,19 +2,24 @@
 #define DECENTRALIZED_DBMS_SHA2_H
 
 #include <iostream>
-//#include <windows.h>
-//#include<unistd.h>
 #include <sstream>
 
-
-#ifdef _WINDOWS
-#include <windows.h>
-#else
+#ifdef __linux__
 #include <unistd.h>
-#define Sleep(x) usleep((x)*1000)
+#endif
+#ifdef _WIN32
+#include <windows.h>
 #endif
 
-
+void mySleep(int sleepMs)
+{
+#ifdef __unix__
+    sleep(sleepMs);
+#endif
+#ifdef _WIN32
+    Sleep(sleepMs*1000);
+#endif
+}
 
 // hastatunner voronq vercvel en hesh algoriti arajin 8 parz tveri qarakusi amrnati amboxj mas@  heshavorelu ardyunqum
 uint32_t s0, s1;
@@ -90,7 +95,7 @@ std::stringstream compression(uint32_t* w) {
 };
 
 std::stringstream hash_2(const char* str) {
-    Sleep(5000);
+    mySleep(5);
     uint32_t* w = new uint32_t[64];
     short counter = 4;
     short ind_w = 0;
