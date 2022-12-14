@@ -1,192 +1,172 @@
-#include <string.h>
+#include <sys/types.h>          
+#include <sys/socket.h>     
+#include <netinet/in.h>     
+#include <arpa/inet.h>  
+#include <netdb.h>  
+#include <unistd.h>     
+#include <errno.h>  
+#include <stdio.h>  
 #include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
+#include <string>
+#include <sstream>
 
-#ifdef _WIN32
-#undef UNICODE
-#define WIN32_LEAN_AND_MEAN
+#define PORT 11111
+#define IP "127.0.0.1"
 
-#include <windows.h>
-#include <winsock2.h>
-#include <ws2tcpip.h>
+int main(){
+    int sockfd = socket(AF_INET,SOCK_STREAM,0);
+    // if(sockfd == INVALID_SOCKET){
+    //     return 1;
+    // }
+    
+    struct sockaddr_in addr;
+    int addrlen = sizeof(addr);
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(PORT);
+    addr.sin_addr.s_addr = inet_addr(IP);
+    int bind_server = bind(sockfd,(sockaddr*) &addr,sizeof(addr));
 
-
-// Need to link with Ws2_32.lib
-#pragma comment (lib, "Ws2_32.lib")
-// #pragma comment (lib, "Mswsock.lib")
-
-#define DEFAULT_BUFLEN 512
-#define DEFAULT_PORT "27015"
-
-int main()
-{
-    WSADATA wsaData;
-    int iResult;
-
-    SOCKET ListenSocket = INVALID_SOCKET;
-    SOCKET ClientSocket = INVALID_SOCKET;
-
-    struct addrinfo* result = NULL;
-    struct addrinfo hints;
-
-    int iSendResult;
-    char recvbuf[DEFAULT_BUFLEN];
-    int recvbuflen = DEFAULT_BUFLEN;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
-        return 1;
+    int listenclient = listen(sockfd,256);
+    while(true){
+        struct sockaddr_in clients;
+        int size_client = sizeof(clients); 
+    
+        int client = accept(sockfd,(struct sockaddr*) &clients,(socklen_t*)&size_client);
+        //int conct = connect(client,(struct sockaddr*) &addr,sizeof(addr));
+    
+    
+        char buf[1024];
+        int msg = read(client,buf,sizeof(buf));
+        std::cout << "Bob: "<< buf << std::endl;
+        char msg_to_client[32];
+        std::cin.getline(msg_to_client,32);
+    
+        int send_msg = send(client,msg_to_client,sizeof(msg_to_client),0);
     }
+    //close(client);
+    
+    //printf("Connection closed!\n");
+    shutdown(sockfd, SHUT_RDWR);
+    /*
+    // fd_set master;
+	// FD_ZERO(&master);
 
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;
+	// // Add our first socket that we're interested in interacting with; the listening socket!
+	// // It's important that this socket is added for our server or else we won't 'hear' incoming
+	// // connections 
+	// FD_SET(listenclient, &master);
 
-    // Resolve the server address and port
-    iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        WSACleanup();
-        return 1;
-    }
+	// // this will be changed by the \quit command (see below, bonus not in video!)
+	// bool running = true; 
 
-    // Create a SOCKET for the server to listen for client connections.
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
-        printf("socket failed with error: %ld\n", WSAGetLastError());
-        freeaddrinfo(result);
-        WSACleanup();
-        return 1;
-    }
+	// while (running)
+	// {
+	// 	// Make a copy of the master file descriptor set, this is SUPER important because
+	// 	// the call to select() is _DESTRUCTIVE_. The copy only contains the sockets that
+	// 	// are accepting inbound connection requests OR messages. 
 
-    // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
+	// 	// E.g. You have a server and it's master file descriptor set contains 5 items;
+	// 	// the listening socket and four clients. When you pass this set into select(), 
+	// 	// only the sockets that are interacting with the server are returned. Let's say
+	// 	// only one client is sending a message at that time. The contents of 'copy' will
+	// 	// be one socket. You will have LOST all the other sockets.
 
-    freeaddrinfo(result);
+	// 	// SO MAKE A COPY OF THE MASTER LIST TO PASS INTO select() !!!
 
-    iResult = listen(ListenSocket, SOMAXCONN);
-    if (iResult == SOCKET_ERROR) {
-        printf("listen failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
+	// 	fd_set copy = master;
 
-    // Accept a client socket
-    ClientSocket = accept(ListenSocket, NULL, NULL);
-    if (ClientSocket == INVALID_SOCKET) {
-        printf("accept failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
-        WSACleanup();
-        return 1;
-    }
+	// 	// See who's talking to us
+	// 	int socketCount = select(0, &copy, 0, 0, 0);
 
-    // No longer need server socket
-    closesocket(ListenSocket);
+	// 	// Loop through all the current connections / potential connect
+	// 	for (int i = 0; i < socketCount; i++)
+	// 	{
+	// 		// Makes things easy for us doing this assignment
+	// 		int sock = copy.fds_bits[i];
+	// 		// Is it an inbound communication?
+	// 		if (sock == listenclient)
+	// 		{
+	// 			// Accept a new connection
+	// 			int client = accept(listenclient, 0, 0);
 
-    // Receive until the peer shuts down the connection
-    do {
+	// 			// Add the new connection to the list of connected clients
+	// 			FD_SET(client, &master);
 
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-        if (iResult > 0) {
-            printf("Bytes received: %d\n", iResult);
+	// 			// Send a welcome message to the connected client
+	// 			std::string welcomeMsg = "Welcome to the Awesome Chat Server!\r\n";
+	// 			send(client, welcomeMsg.c_str(), welcomeMsg.size() + 1, 0);
+	// 		}
+	// 		else // It's an inbound message
+	// 		{
+	// 			char buf[4096] = {0};
+	// 			//ZeroMemory(buf, 4096);
+				
+	// 			// Receive message
+	// 			int bytesIn = recv(sock, buf, 4096, 0);
+	// 			if (bytesIn <= 0)
+	// 			{
+	// 				// Drop the client
+	// 				close(sock);
+	// 				FD_CLR(sock, &master);
+	// 			}
+	// 			else
+	// 			{
+	// 				// Check to see if it's a command. \quit kills the server
+	// 				if (buf[0] == '\\')
+	// 				{
+	// 					// Is the command quit? 
+	// 					std::string cmd = std::string(buf, bytesIn);
+	// 					if (cmd == "\\quit")
+	// 					{
+	// 						running = false;
+	// 						break;
+	// 					}
 
-            // Echo the buffer back to the sender
-            iSendResult = send(ClientSocket, recvbuf, iResult, 0);
-            if (iSendResult == SOCKET_ERROR) {
-                printf("send failed with error: %d\n", WSAGetLastError());
-                closesocket(ClientSocket);
-                WSACleanup();
-                return 1;
-            }
-            printf("Bytes sent: %d\n", iSendResult);
-        }
-        else if (iResult == 0)
-            printf("Connection closing...\n");
-        else {
-            printf("recv failed with error: %d\n", WSAGetLastError());
-            closesocket(ClientSocket);
-            WSACleanup();
-            return 1;
-        }
+	// 					// Unknown command
+	// 					continue;
+	// 				}
 
-    } while (iResult > 0);
+	// 				// Send message to other clients, and definiately NOT the listening socket
 
-    // shutdown the connection since we're done
-    iResult = shutdown(ClientSocket, SD_SEND);
-    if (iResult == SOCKET_ERROR) {
-        printf("shutdown failed with error: %d\n", WSAGetLastError());
-        closesocket(ClientSocket);
-        WSACleanup();
-        return 1;
-    }
+	// 				for (int i = 0; i < *master.fds_bits; i++)
+	// 				{
+	// 					int outSock = master.fds_bits[i];
+	// 					if (outSock != listenclient && outSock != sock)
+	// 					{
+	// 						std::ostringstream ss;
+	// 						ss << "SOCKET #" << sock << ": " << buf << "\r\n";
+	// 						std::string strOut = ss.str();
 
-    // cleanup
-    closesocket(ClientSocket);
-    WSACleanup();
+	// 						send(outSock, strOut.c_str(), strOut.size() + 1, 0);
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 
+	// // Remove the listening socket from the master file descriptor set and close it
+	// // to prevent anyone else trying to connect.
+	// FD_CLR(listenclient, &master);
+	// close(listenclient);
+	
+	// // Message to let users know what's happening.
+	// std::string msg = "Server is shutting down. Goodbye\r\n";
+
+	// while (sizeof(master) > 0)
+	// {
+	// 	// Get the socket number
+	// 	int sock = master.fds_bits[0];
+
+	// 	// Send the goodbye message
+	// 	send(sock, msg.c_str(), msg.size() + 1, 0);
+
+	// 	// Remove it from the master file list and close the socket
+	// 	FD_CLR(sock, &master);
+	// 	close(sock);
+	// }
+    */
     return 0;
 }
 
-#elif defined(__unix__) or defined(__APPLE__)
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/types.h> 
-void error(const char* msg)
-{
-    perror(msg);
-    exit(1);
-}
-
-int main(int argc, char* argv[])
-{
-    int sockfd, newsockfd, portno;
-    socklen_t clilen;
-    char buffer[256];
-    struct sockaddr_in serv_addr, cli_addr;
-    int n;
-    if (argc < 2) {
-        fprintf(stderr, "ERROR, no port provided\n");
-        exit(1);
-    }
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0)
-        error("ERROR opening socket");
-    bzero((char*)&serv_addr, sizeof(serv_addr));
-    portno = atoi(argv[1]);
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(portno);
-    if (bind(sockfd, (struct sockaddr*)&serv_addr,
-        sizeof(serv_addr)) < 0)
-        error("ERROR on binding");
-    listen(sockfd, 5);
-    clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd,
-        (struct sockaddr*)&cli_addr,
-        &clilen);
-    if (newsockfd < 0)
-        error("ERROR on accept");
-    bzero(buffer, 256);
-    n = read(newsockfd, buffer, 255);
-    if (n < 0) error("ERROR reading from socket");
-    printf("Here is the message: %s\n", buffer);
-    n = write(newsockfd, "I got your message", 18);
-    if (n < 0) error("ERROR writing to socket");
-    close(newsockfd);
-    close(sockfd);
-    return 0;
-}
-#endif
