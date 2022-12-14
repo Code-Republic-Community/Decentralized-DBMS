@@ -9,24 +9,38 @@ int rightrotate(uint32_t word, short count)
     return (word >> count)|(word << (32 - count));
 }
 
+std::string push_0(std::string str, int size){
+    std::string ret_str = "00000000";
+    const int size_ = 8;
+    int count_0;
+    count_0 = size_ - size;
+    for (int i = 0; i < size;++i){
+        ret_str[count_0 + i] =  str[i];
+    }
+    return ret_str;
+}
+
 std::stringstream compression (uint32_t * w){
-    uint32_t h0 = 0x6a09e667U;
-    uint32_t h1 = 0xbb67ae85U;
-    uint32_t h2 = 0x3c6ef372U;
-    uint32_t h3 = 0xa54ff53aU;
-    uint32_t h4 = 0x510e527fU;
-    uint32_t h5 = 0x9b05688cU;
-    uint32_t h6 = 0x1f83d9abU;
-    uint32_t h7 = 0x5be0cd19U;
-    uint32_t a, b, c ,d ,e , f, g, h;
-    a = h0;
-    b = h1;
-    c = h2;
-    d = h3;
-    e = h4;
-    f = h5;
-    g = h6;
-    h = h7;
+    
+    const int size_hash = 8;
+    uint32_t hash[size_hash];
+    hash[0] = 0x6a09e667U;
+    hash[1] = 0xbb67ae85U;
+    hash[2] = 0x3c6ef372U;
+    hash[3] = 0xa54ff53aU;
+    hash[4] = 0x510e527fU;
+    hash[5] = 0x9b05688cU;
+    hash[6] = 0x1f83d9abU;
+    hash[7] = 0x5be0cd19U;
+    uint32_t hash_cpy[8];
+    hash_cpy[0] = hash[0];
+    hash_cpy[1] = hash[1];
+    hash_cpy[2] = hash[2];
+    hash_cpy[3] = hash[3];
+    hash_cpy[4] = hash[4];
+    hash_cpy[5] = hash[5];
+    hash_cpy[6] = hash[6];
+    hash_cpy[7] = hash[7];
     uint32_t k[64] = {0x428a2f98U, 0x71374491U, 0xb5c0fbcfU, 0xe9b5dba5U,
         0x3956c25bU, 0x59f111f1U, 0x923f82a4U, 0xab1c5ed5U, 0xd807aa98U,
         0x12835b01U, 0x243185beU, 0x550c7dc3U, 0x72be5d74U, 0x80deb1feU,
@@ -43,39 +57,48 @@ std::stringstream compression (uint32_t * w){
     };
     uint32_t ch,temp1,temp2,maj;
     for (int i = 0; i < 64; ++i){
-        s1 = rightrotate(h4, 6) ^ rightrotate(h4, 11) ^ rightrotate(h4, 25);
-        ch = (h4 & h5) ^ ((~h4) & h6);
+        s1 = rightrotate(hash[4], 6) ^ rightrotate(hash[4], 11) ^ rightrotate(hash[4], 25);
+        ch = (hash[4] & hash[5]) ^ ((~hash[4]) & hash[6]);
         
-        temp1 = h7 + s1 + ch + k[i] + w[i];
+        temp1 = hash[7] + s1 + ch + k[i] + w[i];
         
-        s0 = rightrotate(h0, 2) ^ rightrotate(h0, 13) ^ rightrotate(h0, 22);
-        maj = (h0 & h1) ^ (h0 & h2) ^ (h1 & h2);        
+        s0 = rightrotate(hash[0], 2) ^ rightrotate(hash[0], 13) ^ rightrotate(hash[0], 22);
+        maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);        
         temp2 = s0 + maj;        
-        h7 = h6;
-        h6 = h5;
-        h5 = h4;
-        h4 = h3 + temp1;
-        h3 = h2;
-        h2 = h1;
-        h1 = h0;
-        h0 = temp1 + temp2;
+        hash[7] = hash[6];
+        hash[6] = hash[5];
+        hash[5] = hash[4];
+        hash[4] = hash[3] + temp1;
+        hash[3] = hash[2];
+        hash[2] = hash[1];
+        hash[1] = hash[0];
+        hash[0] = temp1 + temp2;
     }
-    h0 = h0 + a;
-    h1 = h1 + b; 
-    h2 = h2 + c;
-    h3 = h3 + d;
-    h4 = h4 + e;
-    h5 = h5 + f;
-    h6 = h6 + g;
-    h7 = h7 + h;
-    std::stringstream ret_string ;
-    ret_string << std::hex << h0 << h1 << h2 << h3 << h4 << h5 << h6 << h7;
+    
+    hash[0] = hash[0] + hash_cpy[0];
+    hash[1] = hash[1] + hash_cpy[1]; 
+    hash[2] = hash[2] + hash_cpy[2];
+    hash[3] = hash[3] + hash_cpy[3];
+    hash[4] = hash[4] + hash_cpy[4];
+    hash[5] = hash[5] + hash_cpy[5];
+    hash[6] = hash[6] + hash_cpy[6];
+    hash[7] = hash[7] + hash_cpy[7];
+    std::stringstream ret_string;
+    std::stringstream temp;
+    std::string temp_string;
+    for (int i = 0; i < size_hash;++i){
+        temp.str("");
+        temp << std::hex << hash[i];
+        temp_string = temp.str();
+        temp_string = push_0(temp_string,temp_string.length());
+        ret_string << temp_string;
+    }
+    //ret_string << std::hex << hash[0] << hash[1] << hash[2] << hash[3] << hash[4] << hash[5] << hash[6] << hash[7];
     return ret_string;
 }
 
 std::stringstream hash_2(const char* str){
-    
-    unsigned int* w = new unsigned int[64];
+    uint32_t* w = new uint32_t[64];
     short counter = 4;
     short ind_w = 0;
     short ind_str = 0;
@@ -112,7 +135,6 @@ std::stringstream hash_2(const char* str){
         w[ind_w - 1] += 1;
         w[ind_w - 1] <<= (32 - full_in_32 - 1);
     }
-        
     for (;ind_w < 64;++ind_w)
     {
         *(w  + ind_w) = 0;
