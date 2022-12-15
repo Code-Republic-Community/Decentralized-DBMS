@@ -1,5 +1,6 @@
 #include "Block.h"
 #include "SHA2.h"
+
 Block::Block(unsigned int idx, Data d, std::string ph) {
     _index = idx;
     _data = d.text;
@@ -13,6 +14,9 @@ std::string Block::calculate_hash() {
     return hash_2(s.data()).str();
 }
 
+std::string Block::get_data(){
+    return _data;
+}
 std::string Block::get_hash() {
     return _hash;
 }
@@ -20,6 +24,7 @@ std::string Block::get_hash() {
 std::string Block::get_prev_hash() {
     return _prev_hash;
 }
+
 bool Block::is_hash_valid() {
     return _hash == calculate_hash();
 }

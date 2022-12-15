@@ -3,10 +3,14 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
+#include <string>
 #include "Block.h"
+#include <cstdlib>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 
 class BlockChain {
-
 public:
     BlockChain();
     std::vector<Block> chain;
@@ -14,9 +18,10 @@ public:
     void add_block(Data data);
     Block get_last_block();
     int count_of_blocks();
+    void print_chain_blocks();
+    void convert_chain_to_json();
 private:
     Block create_genesis_block();
 };
-
 
 #endif //DECENTRALIZED_DBMS_BLOCKCHAIN_H
