@@ -7,14 +7,14 @@
 #include <string.h>
 #include <string>
  
-using namespace std;
+//using namespace std;
 //o_server@ tvyal poxancox servern e 
 int main()
 {
     int sock_fd, new_sock_fd, portno;
     socklen_t o_server_length;
     struct sockaddr_in my_serv_addr, o_server__addr;
-    char bufer[100];
+    char bufer[2000];
     sock_fd =  socket(AF_INET, SOCK_STREAM, 0);
     if (sock_fd == -1){
         std::cout << "socked not defined";

@@ -93,7 +93,7 @@ std::stringstream compression (uint32_t * w){
         temp_string = push_0(temp_string,temp_string.length());
         ret_string << temp_string;
     }
-    //ret_string << std::hex << hash[0] << hash[1] << hash[2] << hash[3] << hash[4] << hash[5] << hash[6] << hash[7];
+    delete []w;
     return ret_string;
 }
 

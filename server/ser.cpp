@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
     //    fprintf(stderr,"ERROR, no port provided\n");
     //    exit(1);
     //}
-     // create a socket
-     // socket(int domain, int type, int protocol)
+    // create a socket
+    // socket(int domain, int type, int protocol)
      sockfd =  socket(AF_INET, SOCK_STREAM, 0);
      if (sockfd < 0) 
         error("ERROR opening socket");
@@ -39,10 +39,10 @@ int main(int argc, char *argv[])
      // server byte order
     serv_addr.sin_family = AF_INET;  
 
-     // automatically be filled with current host's IP address
+    // automatically be filled with current host's IP address
     serv_addr.sin_addr.s_addr = INADDR_ANY;  
 
-     // convert short integer value for port must be converted into network byte order
+    // convert short integer value for port must be converted into network byte order
     serv_addr.sin_port = 3000;
      // bind(int fd, struct sockaddr *local_addr, socklen_t addr_length)
      // bind() passes file descriptor, the address structure, 

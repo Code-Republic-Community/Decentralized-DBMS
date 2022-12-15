@@ -6,21 +6,23 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <string>
-
-using namespace std;
+#include <vector>
+//using namespace std;
 
 int main()
 {
+    std::vector <std::string> IPv4; 
     //	Create a socket
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1)
     {
-        return 1;
+        return -1;
     }
 
     //	Create a hint structure for the server we're connecting with
     int port = 54000;
-    string ipAddress = "192.168.10.158";
+    //for (int i = 0; i < )
+    std::string ipAddress = "192.168.10.158";
 
     sockaddr_in hint;
     hint.sin_family = AF_INET;
@@ -36,19 +38,19 @@ int main()
 
     //	While loop:
     char buf[4096];
-    string userInput;
+    std::string userInput;
 
 
     do {
         //		Enter lines of text
-        cout << "> ";
-        getline(cin, userInput);
+        std::cout << "> ";
+        std::getline(std::cin, userInput);
 
         //		Send to server
         int sendRes = send(sock, userInput.c_str(), userInput.size() + 1, 0);
         if (sendRes == -1)
         {
-            cout << "Could not send to server! Whoops!\r\n";
+            std::cout << "Could not send to server! Whoops!\r\n";
             continue;
         }
 
@@ -57,12 +59,12 @@ int main()
         int bytesReceived = recv(sock, buf, 4096, 0);
         if (bytesReceived == -1)
         {
-            cout << "There was an error getting response from server\r\n";
+            std::cout << "There was an error getting response from server\r\n";
         }
         else
         {
             //		Display response
-            cout << "SERVER> " << string(buf, bytesReceived) << "\r\n";
+            std::cout << "SERVER> " << std::string(buf, bytesReceived) << "\r\n";
         }
     } while(true);
 
