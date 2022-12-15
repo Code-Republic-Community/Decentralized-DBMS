@@ -74,7 +74,6 @@ void BlockChain::convert_chain_to_json() {
     std::stringstream jsonEncodedData(myString);
     boost::property_tree::ptree rootHive;
 
-
     boost::property_tree::read_json(jsonEncodedData, rootHive);
 
 
