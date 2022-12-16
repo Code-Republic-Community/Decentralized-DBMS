@@ -8,6 +8,8 @@
 #include <stdio.h>  
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 #include <iostream>
 
 #define PORT 11111
@@ -23,9 +25,14 @@ int main(){
     addr.sin_port = htons(PORT);
     int cnn = connect(sockfd,(struct sockaddr*) &addr,sizeof(addr));
     while(true){
-        char buf[256] = {0};
+        char buf[1024] = {0};
+        std::stringstream ss;
+        std::ifstream file;
+        file.open("myfile.txt"); 
+        ss << file.rdbuf();
+        strcpy(buf,ss.str().c_str());
         char rcv[256] = {0};
-        std::cin.getline(buf,256);
+        //std::cin.getline(buf,256);
         send(sockfd,buf,256,0);
         recv(sockfd,rcv,256,0);
         printf("Alice: %s\n",rcv);
