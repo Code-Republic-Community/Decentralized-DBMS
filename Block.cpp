@@ -1,10 +1,10 @@
 #include "Block.h"
 #include "SHA2.h"
 
-Block::Block(unsigned int idx, Data d, std::string ph) {
+Block::Block(unsigned int idx, Data data, std::string prev_hash) {
     _index = idx;
-    _data = d.text;
-    _prev_hash = ph;
+    _data = data.text;
+    _prev_hash = prev_hash;
     _hash = calculate_hash();
 }
 

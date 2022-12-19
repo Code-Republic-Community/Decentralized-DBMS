@@ -19,10 +19,8 @@ void mySleep(int sleepMs)
 #endif
 }
 
-
-// hastatunner voronq vercvel en hesh algoriti arajin 8 parz tveri qarakusi amrnati amboxj mas@  heshavorelu ardyunqum
 uint32_t s0, s1;
-// hastatunner [2,311] mijakayqi parz tveric qarakusi armat hanac kotorakayin maseri 16 akan tesq@
+
 int rightrotate(uint32_t word, short count)
 {
     count -=  int(count/32) * 32;
@@ -41,7 +39,6 @@ std::string push_0(std::string str, int size){
 }
 
 std::stringstream compression (uint32_t * w){
-
     const int size_hash = 8;
     uint32_t hash[size_hash];
     hash[0] = 0x6a09e667U;
@@ -53,14 +50,10 @@ std::stringstream compression (uint32_t * w){
     hash[6] = 0x1f83d9abU;
     hash[7] = 0x5be0cd19U;
     uint32_t hash_cpy[8];
-    hash_cpy[0] = hash[0];
-    hash_cpy[1] = hash[1];
-    hash_cpy[2] = hash[2];
-    hash_cpy[3] = hash[3];
-    hash_cpy[4] = hash[4];
-    hash_cpy[5] = hash[5];
-    hash_cpy[6] = hash[6];
-    hash_cpy[7] = hash[7];
+
+    for(int i = 0; i<=7; ++i){
+        hash_cpy[i]  = hash[i];
+    }
     uint32_t k[64] = {0x428a2f98U, 0x71374491U, 0xb5c0fbcfU, 0xe9b5dba5U,
                       0x3956c25bU, 0x59f111f1U, 0x923f82a4U, 0xab1c5ed5U, 0xd807aa98U,
                       0x12835b01U, 0x243185beU, 0x550c7dc3U, 0x72be5d74U, 0x80deb1feU,
@@ -85,24 +78,22 @@ std::stringstream compression (uint32_t * w){
         s0 = rightrotate(hash[0], 2) ^ rightrotate(hash[0], 13) ^ rightrotate(hash[0], 22);
         maj = (hash[0] & hash[1]) ^ (hash[0] & hash[2]) ^ (hash[1] & hash[2]);
         temp2 = s0 + maj;
-        hash[7] = hash[6];
-        hash[6] = hash[5];
-        hash[5] = hash[4];
-        hash[4] = hash[3] + temp1;
-        hash[3] = hash[2];
-        hash[2] = hash[1];
-        hash[1] = hash[0];
-        hash[0] = temp1 + temp2;
-    }
 
-    hash[0] = hash[0] + hash_cpy[0];
-    hash[1] = hash[1] + hash_cpy[1];
-    hash[2] = hash[2] + hash_cpy[2];
-    hash[3] = hash[3] + hash_cpy[3];
-    hash[4] = hash[4] + hash_cpy[4];
-    hash[5] = hash[5] + hash_cpy[5];
-    hash[6] = hash[6] + hash_cpy[6];
-    hash[7] = hash[7] + hash_cpy[7];
+        for(int i = 7; i>=0; --i){
+            if(i == 4){
+                hash[i] = hash[i-1] + temp1;
+            }
+            else if(i == 0){
+                hash[i] = temp1 + temp2;
+            }
+            else{
+                hash[i] = hash[i-1];
+            }
+        }
+    }
+    for(int i = 0; i<=7; ++i){
+        hash[i] += hash_cpy[i];
+    }
     std::stringstream ret_string;
     std::stringstream temp;
     std::string temp_string;
@@ -113,13 +104,12 @@ std::stringstream compression (uint32_t * w){
         temp_string = push_0(temp_string,temp_string.length());
         ret_string << temp_string;
     }
-    //ret_string << std::hex << hash[0] << hash[1] << hash[2] << hash[3] << hash[4] << hash[5] << hash[6] << hash[7];
     return ret_string;
 }
 
 std::stringstream hash_2(const char* str){
 
-    mySleep(5);
+    //mySleep(5);
     uint32_t* w = new uint32_t[64];
     short counter = 4;
     short ind_w = 0;

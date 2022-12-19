@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <fstream>
 
 class BlockChain {
 public:
