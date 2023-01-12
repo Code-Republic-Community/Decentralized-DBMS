@@ -159,7 +159,6 @@ void* run_server(void* nothing)
         for (i = 0; i < max_clients; i++)
         {
             sd = client_socket[i];
-
             if (FD_ISSET( sd , &readfds))
             {
                 //Check if it was for closing , and also read the

@@ -57,7 +57,6 @@ void BlockChain::convert_chain_to_json() {
     std::string i_data = std::to_string(_index) + ".data";
     std::string i_hash = std::to_string(_index) + ".hash";
     std::string i_prev_hash = std::to_string(_index) + ".previoushash";
-
     std::string _data = chain[_index].get_data();
     std::string _prev_hash = chain[_index].get_prev_hash();
     std::string _hash = chain[0].get_hash();
