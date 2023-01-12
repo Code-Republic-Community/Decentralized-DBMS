@@ -17,6 +17,7 @@ std::string Block::calculate_hash() {
 std::string Block::get_data(){
     return _data;
 }
+
 std::string Block::get_hash() {
     return _hash;
 }
